@@ -1,0 +1,14 @@
+{
+	{$CADDY_GLOBAL_OPTIONS}
+
+	frankenphp {
+		{$FRANKENPHP_CONFIG}
+	}
+}
+
+:{$PORT:8080} {
+	root * /app
+	encode zstd br gzip
+
+	php_server
+}

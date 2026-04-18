@@ -12,9 +12,10 @@ RUN apt-get update && apt-get install -y \
 
 # Copia os arquivos do projeto
 COPY . /app
-COPY docker-entrypoint.sh /docker-entrypoint.sh
-RUN chmod +x /docker-entrypoint.sh
+
+# Copia o Caddyfile customizado
+COPY Caddyfile /etc/caddy/Caddyfile
 
 WORKDIR /app
 
-CMD ["/docker-entrypoint.sh"]
+CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"]
