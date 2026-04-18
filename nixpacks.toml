@@ -1,8 +1,11 @@
 [phases.setup]
-nixPkgs = ["php84", "php84Extensions.pdo_pgsql", "php84Extensions.pgsql", "php84Extensions.gd", "php84Extensions.mbstring", "php84Extensions.fileinfo", "python312", "python312Packages.pip"]
+aptPkgs = ["libpq-dev", "python3", "python3-pip"]
 
-[phases.install]
-cmds = ["pip install reportlab pypdf Pillow qrcode[pil] --break-system-packages || pip3 install reportlab pypdf Pillow 'qrcode[pil]' --user"]
+[phases.build]
+cmds = [
+  "docker-php-ext-install pdo pdo_pgsql pgsql",
+  "pip3 install reportlab pypdf Pillow 'qrcode[pil]' --break-system-packages"
+]
 
 [start]
-cmd = "php -S 0.0.0.0:$PORT"
+cmd = "frankenphp run --config /Caddyfile"
