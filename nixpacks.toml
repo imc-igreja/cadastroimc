@@ -1,0 +1,8 @@
+[phases.setup]
+nixPkgs = ["php84", "php84Extensions.pdo_pgsql", "php84Extensions.pgsql", "php84Extensions.gd", "php84Extensions.mbstring", "php84Extensions.fileinfo", "python312", "python312Packages.pip"]
+
+[phases.install]
+cmds = ["pip install reportlab pypdf Pillow qrcode[pil] --break-system-packages || pip3 install reportlab pypdf Pillow 'qrcode[pil]' --user"]
+
+[start]
+cmd = "php -S 0.0.0.0:$PORT"
