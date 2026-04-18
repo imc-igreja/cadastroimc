@@ -15,6 +15,8 @@ COPY . /app
 
 WORKDIR /app
 
-ENV SERVER_NAME=":${PORT:-8080}"
+# Script de entrada que usa $PORT do Railway
+RUN echo '#!/bin/sh\nexec frankenphp php-server --root /app --listen :${PORT:-8080}' > /entrypoint.sh \
+    && chmod +x /entrypoint.sh
 
-CMD ["frankenphp", "php-server", "--root", "/app"]
+CMD ["/bin/sh", "/entrypoint.sh"]
