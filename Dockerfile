@@ -15,7 +15,6 @@ COPY . /app
 
 WORKDIR /app
 
-# Porta padrão do Railway
-ENV PORT=8080
+ENV SERVER_NAME=":${PORT:-8080}"
 
 CMD ["frankenphp", "php-server", "--root", "/app"]
