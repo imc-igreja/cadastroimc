@@ -1,0 +1,30 @@
+# Compressão gzip
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css text/javascript application/javascript application/json
+</IfModule>
+
+# Cache de assets estáticos
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/png             "access plus 1 month"
+    ExpiresByType image/jpeg            "access plus 1 month"
+    ExpiresByType text/css              "access plus 1 week"
+    ExpiresByType application/javascript "access plus 1 week"
+</IfModule>
+
+# Desabilitar ETags desnecessários
+FileETag None
+
+# Segurança - bloquear acesso a arquivos sensíveis
+<FilesMatch "\.(env|git|gitignore|md)$">
+  Order allow,deny
+  Deny from all
+</FilesMatch>
+
+# PHP settings para performance
+<IfModule mod_php.c>
+  php_value upload_max_filesize 5M
+  php_value post_max_size 6M
+  php_value max_execution_time 60
+  php_value memory_limit 128M
+</IfModule>

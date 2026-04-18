@@ -1,0 +1,16 @@
+# Arquivos sensíveis
+.env
+config.php
+
+# Uploads e PDFs gerados
+uploads/*
+!uploads/.gitkeep
+pdfs/*
+!pdfs/.gitkeep
+
+# Fontes (se forem grandes)
+*.ttf
+
+# Sistema
+.DS_Store
+Thumbs.db
