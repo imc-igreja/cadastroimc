@@ -11,10 +11,13 @@
  */
 
 // Conexão Supabase (PostgreSQL) — usa variáveis de ambiente em produção
-define('SUPABASE_HOST', getenv('SUPABASE_HOST') ?: 'db.mrzfopdvijuwixovfsql.supabase.co');
-define('SUPABASE_PORT', getenv('SUPABASE_PORT') ?: '5432');
+// Em produção usa o pooler IPv4 do Supabase (porta 6543)
+$is_prod = getenv('RAILWAY_ENVIRONMENT') !== false;
+
+define('SUPABASE_HOST', getenv('SUPABASE_HOST') ?: ($is_prod ? 'aws-0-us-east-1.pooler.supabase.com' : 'db.mrzfopdvijuwixovfsql.supabase.co'));
+define('SUPABASE_PORT', getenv('SUPABASE_PORT') ?: ($is_prod ? '6543' : '5432'));
 define('SUPABASE_DB',   getenv('SUPABASE_DB')   ?: 'postgres');
-define('SUPABASE_USER', getenv('SUPABASE_USER') ?: 'postgres');
+define('SUPABASE_USER', getenv('SUPABASE_USER') ?: 'postgres.mrzfopdvijuwixovfsql');
 define('SUPABASE_PASS', getenv('SUPABASE_PASS') ?: 'UHARfJQ290EukfEx');
 
 define('UPLOAD_DIR', __DIR__ . '/uploads/');
@@ -39,12 +42,11 @@ function conectar(): PDO {
         'pgsql:host=%s;port=%s;dbname=%s;sslmode=require',
         SUPABASE_HOST, SUPABASE_PORT, SUPABASE_DB
     );
-    $pdo = new PDO($dsn, SUPABASE_USER, SUPABASE_PASS, [
+    return new PDO($dsn, SUPABASE_USER, SUPABASE_PASS, [
         PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_PERSISTENT         => true,
+        PDO::ATTR_PERSISTENT         => false,
     ]);
-    return $pdo;
 }
 
 function criarTabelas(): void {
