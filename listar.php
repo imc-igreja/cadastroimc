@@ -49,7 +49,13 @@ session_write_close();
     color: var(--text);
     min-height: 100vh;
     scrollbar-gutter: stable;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
+
+  /* Touch improvements */
+  a, button, input, select { -webkit-tap-highlight-color: rgba(0,0,0,0.1); }
+  input, select, textarea { font-size: 16px; } /* Previne zoom no iOS */
 
   .topbar {
     padding: 24px 0 12px;
@@ -272,8 +278,26 @@ session_write_close();
   .btn-cancel:hover { background: #e5e1db; }
 
   @media(max-width:700px){
-    table { display: block; overflow-x: auto; }
+    table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
     .card { padding: 18px; }
+    .card-header { flex-direction: column; align-items: flex-start; padding: 12px 18px; margin: -18px -18px 16px; }
+    .card-header > div { width: 100%; }
+    .search-box { width: 100%; margin-bottom: 8px; }
+    .search-box input { width: 100%; }
+    .topbar h1 { font-size: .95rem; padding: 8px 20px; }
+    .topbar-logo { width: 60px; height: 60px; }
+    .nav-bar { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .nav-bar a { white-space: nowrap; }
+    th, td { font-size: .75rem; padding: 8px 10px; }
+    th:first-child, td:first-child { padding-left: 18px; }
+    th:last-child, td:last-child { padding-right: 18px; }
+    .btn { font-size: .72rem; padding: 5px 10px; }
+    .foto-thumb, .no-foto { width: 32px; height: 40px; }
+    .badge { font-size: .68rem; padding: 2px 8px; }
+    .modal { max-width: 90%; padding: 20px; }
+    .modal h3 { font-size: .95rem; }
+    .modal-actions { flex-direction: column; }
+    .modal-actions .btn { width: 100%; }
   }
 </style>
 </head>

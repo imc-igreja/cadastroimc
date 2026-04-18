@@ -49,7 +49,11 @@ session_write_close();
     --error-text: #9a2020;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'Montserrat',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; scrollbar-gutter:stable; }
+  body { font-family:'Montserrat',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; scrollbar-gutter:stable; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+  /* Touch improvements */
+  a, button, input, select { -webkit-tap-highlight-color: rgba(0,0,0,0.1); }
+  input, select, textarea { font-size: 16px; } /* Previne zoom no iOS */
 
   .topbar { padding:24px 0 12px; text-align:center; display:flex; flex-direction:column; align-items:center; }
   .topbar-logo { width:80px; height:80px; margin-bottom:12px; display:block; }
@@ -94,7 +98,7 @@ session_write_close();
   .alert-success { background:var(--success-bg); color:var(--success-text); border-left:4px solid var(--success-text); }
   .alert-error   { background:var(--error-bg); color:var(--error-text); border-left:4px solid var(--danger); }
 
-  @media(max-width:600px){ .form-grid { grid-template-columns:1fr; } .card { padding:24px 20px; } }
+  @media(max-width:600px){ .form-grid { grid-template-columns: 1fr; } .card { padding: 24px 20px; } .card-title { font-size: 1rem; padding: 12px 20px; margin: -24px -20px 20px; } .section-title { padding: 12px 20px 4px; margin-left: -20px; margin-right: -20px; } .topbar h1 { font-size: .95rem; padding: 8px 20px; } .topbar-logo { width: 60px; height: 60px; } .nav-bar { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; } .nav-bar a { white-space: nowrap; } }
 </style>
 </head>
 <body>

@@ -49,7 +49,13 @@ session_write_close();
     min-height: 100vh;
     padding: 0;
     scrollbar-gutter: stable;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
+
+  /* Touch improvements */
+  a, button, input, select { -webkit-tap-highlight-color: rgba(0,0,0,0.1); }
+  input, select, textarea { font-size: 16px; } /* Previne zoom no iOS */
 
   .topbar {
     padding: 24px 0 12px;
@@ -242,6 +248,12 @@ session_write_close();
     .form-grid { grid-template-columns: 1fr; }
     .form-grid .full { grid-column: 1; }
     .card { padding: 24px 20px; }
+    .card-title { font-size: 1rem; padding: 12px 20px; margin: -24px -20px 20px; }
+    .section-title { padding: 12px 20px 4px; margin-left: -20px; margin-right: -20px; }
+    .topbar h1 { font-size: .95rem; padding: 8px 20px; }
+    .topbar-logo { width: 60px; height: 60px; }
+    .nav-bar { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .nav-bar a { white-space: nowrap; }
   }
 </style>
 </head>
