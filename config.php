@@ -14,7 +14,7 @@
 // Em produção usa o pooler IPv4 do Supabase (porta 6543)
 $is_prod = getenv('RAILWAY_ENVIRONMENT') !== false;
 
-define('SUPABASE_HOST', getenv('SUPABASE_HOST') ?: ($is_prod ? 'aws-0-us-east-1.pooler.supabase.com' : 'db.mrzfopdvijuwixovfsql.supabase.co'));
+define('SUPABASE_HOST', getenv('SUPABASE_HOST') ?: ($is_prod ? 'aws-1-us-east-2.pooler.supabase.com' : 'db.mrzfopdvijuwixovfsql.supabase.co'));
 define('SUPABASE_PORT', getenv('SUPABASE_PORT') ?: ($is_prod ? '6543' : '5432'));
 define('SUPABASE_DB',   getenv('SUPABASE_DB')   ?: 'postgres');
 define('SUPABASE_USER', getenv('SUPABASE_USER') ?: 'postgres.mrzfopdvijuwixovfsql');
