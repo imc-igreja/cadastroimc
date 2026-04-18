@@ -1,6 +1,5 @@
 # Arquivos sensíveis
 .env
-config.php
 
 # Uploads e PDFs gerados
 uploads/*
