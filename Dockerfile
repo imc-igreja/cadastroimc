@@ -12,11 +12,9 @@ RUN apt-get update && apt-get install -y \
 
 # Copia os arquivos do projeto
 COPY . /app
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
 
 WORKDIR /app
 
-# Script de entrada que usa $PORT do Railway
-RUN echo '#!/bin/sh\nexec frankenphp php-server --root /app --listen :${PORT:-8080}' > /entrypoint.sh \
-    && chmod +x /entrypoint.sh
-
-CMD ["/bin/sh", "/entrypoint.sh"]
+CMD ["/docker-entrypoint.sh"]
