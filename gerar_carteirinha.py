@@ -192,11 +192,12 @@ def criar_camada(d):
             qr_img.save(qr_buf, format='PNG')
             qr_buf.seek(0)
 
-            # Posição do QR no verso — x0=441.2 top=358.2 x1=491.7 bot=382.4
-            # y_pdf = 543 - 382.4 = 160.6 → tamanho = 50.5 x 24.2
-            qr_x = 441
-            qr_y = 161
-            qr_size = 18
+            # Posição do QR no verso — sobrepõe o QR estático grande
+            # x0=386.4 top=326.2 x1=621.3 bot=399.4 (rect grande do verso)
+            # QR estático fica em x≈535, top≈330, bot≈395 → y_pdf=543-395=148
+            qr_x = 535
+            qr_y = 148
+            qr_size = 62
 
             c.drawImage(ImageReader(qr_buf), qr_x, qr_y, width=qr_size, height=qr_size)
         except Exception as e:
@@ -204,45 +205,45 @@ def criar_camada(d):
 
     # Registro (campo amarelo) — x0=160.6 top=295.3 x1=215.6 bot=313.4
     escrever(c, trunc(d.get('registro', ''), 8),
-             x=188, y=232, size=7, bold=True, cor=TEXTO_ESC, align='center')
+             x=188, y=236, size=7, bold=True, cor=TEXTO_ESC, align='center')
 
     # Nome — x0=220.4 top=304.8 x1=366.4 bot=323.1
     escrever(c, trunc(d.get('nome', ''), 30),
-             x=228, y=222, size=7, bold=False, cor=TEXTO_ESC)
+             x=228, y=226, size=7, bold=False, cor=TEXTO_ESC)
 
     # Cargo — x0=219.4 top=335.5 x1=288.1 bot=353.8
     escrever(c, trunc(d.get('cargo', ''), 13),
-             x=227, y=191, size=6.5, bold=False, cor=TEXTO_ESC)
+             x=227, y=195, size=6.5, bold=False, cor=TEXTO_ESC)
 
     # CPF — x0=294.3 top=335.5 x1=360.6 bot=353.8
     escrever(c, trunc(d.get('cpf', ''), 14),
-             x=302, y=191, size=6.5, bold=False, cor=TEXTO_ESC)
+             x=302, y=195, size=6.5, bold=False, cor=TEXTO_ESC)
 
     # RG — x0=219.9 top=369.8 x1=282.4 bot=388.1
     escrever(c, trunc(d.get('rg', ''), 13),
-             x=227, y=157, size=6.5, bold=False, cor=TEXTO_ESC)
+             x=227, y=161, size=6.5, bold=False, cor=TEXTO_ESC)
 
     # Ordenação — x0=294.3 top=369.8 x1=360.6 bot=388.1
     escrever(c, fmt_data(d.get('data_ordenacao', '')),
-             x=302, y=157, size=6.5, bold=False, cor=TEXTO_ESC)
+             x=302, y=161, size=6.5, bold=False, cor=TEXTO_ESC)
 
     # ── VERSO ──────────────────────────────────────────────────────
 
     # Nacionalidade — x0=405.7 top=272.2 x1=492.7 bot=290.5
     escrever(c, trunc(d.get('nacionalidade', 'Brasileira'), 14),
-             x=413, y=255, size=6.5, bold=False, cor=TEXTO_ESC)
+             x=413, y=259, size=6.5, bold=False, cor=TEXTO_ESC)
 
     # Naturalidade — x0=511.4 top=272.2 x1=598.4 bot=290.5
     escrever(c, trunc(d.get('naturalidade', ''), 18),
-             x=519, y=255, size=6, bold=False, cor=TEXTO_ESC)
+             x=519, y=259, size=6, bold=False, cor=TEXTO_ESC)
 
     # Validade — x0=405.7 top=309.0 x1=492.7 bot=327.3
     escrever(c, fmt_data(d.get('data_validade', '')),
-             x=413, y=218, size=6.5, bold=False, cor=TEXTO_ESC)
+             x=413, y=222, size=6.5, bold=False, cor=TEXTO_ESC)
 
     # Estado Civil — x0=511.4 top=307.5 x1=598.4 bot=325.8
     escrever(c, trunc(d.get('estado_civil', ''), 13),
-             x=519, y=219, size=6.5, bold=False, cor=TEXTO_ESC)
+             x=519, y=223, size=6.5, bold=False, cor=TEXTO_ESC)
 
     # Presidente e cargo já estão fixos no modelo — não inserir
 
