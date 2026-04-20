@@ -85,22 +85,21 @@ def escrever(c, texto, x, y, size=7, bold=False, cor=BRANCO, align='left'):
 #
 # Convertido do pdfplumber (origem superior):  y_pdf = PH - y_plumber
 #
-# FRENTE (card esquerdo x: 146–374)
-#   Campo amarelo Registro:  centro x=248.9  y_plumber≈284  → y=259
-#   Campo Nome:              centro x=257.0  y_plumber≈314  → y=229
-#   Campo Cargo:             centro x=206.1  y_plumber≈345  → y=198
-#   Campo Registro (azul):   centro x=307.9  y_plumber≈345  → y=198
-#   Campo RG:                centro x=206.6  y_plumber≈379  → y=164
-#   Campo Ordenação:         centro x=307.9  y_plumber≈379  → y=164
-#   Foto:                    x=164.6  y_base=258  w=40  h=30
+# FRENTE (card x: 146–382)
+#   Campo amarelo Registro:  x0=160.6 top=295.3 x1=215.6 bot=313.4 → centro x=188, y_pdf=543-313=230
+#   Campo Nome:              x0=220.4 top=304.8 x1=366.4 bot=323.1 → x=228, y_pdf=543-323=220
+#   Campo Cargo:             x0=219.4 top=335.5 x1=288.1 bot=353.8 → x=227, y_pdf=543-354=189
+#   Campo CPF:               x0=294.3 top=335.5 x1=360.6 bot=353.8 → x=302, y_pdf=543-354=189
+#   Campo RG:                x0=219.9 top=369.8 x1=282.4 bot=388.1 → x=227, y_pdf=543-388=155
+#   Campo Ordenação:         x0=294.3 top=369.8 x1=360.6 bot=388.1 → x=302, y_pdf=543-388=155
+#   Foto (avatar):           x0=160.6 top=317.5 x1=215.7 bot=370.3 → x=163, y_pdf=543-370=173
 #
-# VERSO (card direito x: 399–633)
-#   Campo Nacionalidade:     centro x=466.4  y_plumber≈279  → y=264
-#   Campo Naturalidade:      centro x=572.1  y_plumber≈279  → y=264
-#   Campo Validade:          centro x=466.4  y_plumber≈316  → y=227
-#   Campo Estado Civil:      centro x=572.1  y_plumber≈315  → y=228
-#   Presidente nome:         centro x=517.0  y_plumber≈380  → y=163
-#   Presidente cargo:        centro x=517.0  y_plumber≈389  → y=154
+# VERSO (card x: 386–621)
+#   Campo Nacionalidade:     x0=405.7 top=272.2 x1=492.7 bot=290.5 → x=413, y_pdf=543-290=253
+#   Campo Naturalidade:      x0=511.4 top=272.2 x1=598.4 bot=290.5 → x=519, y_pdf=543-290=253
+#   Campo Validade:          x0=405.7 top=309.0 x1=492.7 bot=327.3 → x=413, y_pdf=543-327=216
+#   Campo Estado Civil:      x0=511.4 top=307.5 x1=598.4 bot=325.8 → x=519, y_pdf=543-326=217
+#   QR code:                 x0=441.2 top=358.2 x1=491.7 bot=382.4 → x=441, y_pdf=543-382=161
 
 def criar_camada(d):
     """Cria um PDF em memória com apenas os textos/foto sobre fundo transparente."""
@@ -119,7 +118,8 @@ def criar_camada(d):
             pil_img = Image.open(foto_path)
             img_width, img_height = pil_img.size
             
-            # Dimensões da área da foto na carteirinha (espaço do avatar, lado esquerdo)
+            # Dimensões da área da foto na carteirinha (avatar azul)
+            # x0=160.6 top=317.5 x1=215.7 bot=370.3 → w=55, h=52.8
             target_width = 46
             target_height = 48
             
@@ -141,9 +141,10 @@ def criar_camada(d):
                 x_offset = 0
                 y_offset = (new_height - target_height) / 2
             
-            # Posição da foto (área do avatar, lado esquerdo da frente)
-            foto_x = 293
-            foto_y = 246
+            # Posição da foto — avatar azul: x0=160.6 top=317.5 x1=215.7 bot=370.3
+            # y_pdf = 543 - 370.3 = 172.7
+            foto_x = 163
+            foto_y = 173
             
             # Raio dos cantos arredondados
             corner_radius = 5
@@ -191,60 +192,57 @@ def criar_camada(d):
             qr_img.save(qr_buf, format='PNG')
             qr_buf.seek(0)
 
-            # Posição do QR no verso — sobre o QR estático pequeno
-            # QR pequeno fica ao lado do texto legal, lado direito
-            qr_x = 558
-            qr_y = 190
+            # Posição do QR no verso — x0=441.2 top=358.2 x1=491.7 bot=382.4
+            # y_pdf = 543 - 382.4 = 160.6 → tamanho = 50.5 x 24.2
+            qr_x = 441
+            qr_y = 161
             qr_size = 18
 
             c.drawImage(ImageReader(qr_buf), qr_x, qr_y, width=qr_size, height=qr_size)
         except Exception as e:
             print(f"Erro ao gerar QR code: {e}")
 
-    # Registro (campo amarelo) — centralizado no campo x:216–282
-    # y_plumber rect: top=276.6 bot=292.5 → centro=284.5 → y_pdf=543-284.5=258.5
-    escrever(c, trunc(d.get('registro', ''), 10),
-             x=249, y=256, size=7.5, bold=True, cor=TEXTO_ESC, align='center')
-
-    # Nome — campo x:162–351, y_top=304 y_bot=323 → y_pdf centro=229
-    # alinhado à esquerda com padding de 8pt
-    escrever(c, trunc(d.get('nome', ''), 32),
-             x=170, y=226, size=7, bold=False, cor=BRANCO)
-
-    # Cargo — campo x:162–250, centro y=198
-    escrever(c, trunc(d.get('cargo', ''), 13),
-             x=170, y=195, size=6.5, bold=False, cor=CINZA_CLARO)
-
-    # Registro (campo azul frente) — campo x:264–351, centro y=198
+    # Registro (campo amarelo) — x0=160.6 top=295.3 x1=215.6 bot=313.4
     escrever(c, trunc(d.get('registro', ''), 8),
-             x=272, y=195, size=6.5, bold=False, cor=CINZA_CLARO)
+             x=188, y=232, size=7, bold=True, cor=TEXTO_ESC, align='center')
 
-    # RG — campo x:163–250, centro y=164
+    # Nome — x0=220.4 top=304.8 x1=366.4 bot=323.1
+    escrever(c, trunc(d.get('nome', ''), 30),
+             x=228, y=222, size=7, bold=False, cor=TEXTO_ESC)
+
+    # Cargo — x0=219.4 top=335.5 x1=288.1 bot=353.8
+    escrever(c, trunc(d.get('cargo', ''), 13),
+             x=227, y=191, size=6.5, bold=False, cor=TEXTO_ESC)
+
+    # CPF — x0=294.3 top=335.5 x1=360.6 bot=353.8
+    escrever(c, trunc(d.get('cpf', ''), 14),
+             x=302, y=191, size=6.5, bold=False, cor=TEXTO_ESC)
+
+    # RG — x0=219.9 top=369.8 x1=282.4 bot=388.1
     escrever(c, trunc(d.get('rg', ''), 13),
-             x=170, y=161, size=6.5, bold=False, cor=CINZA_CLARO)
+             x=227, y=157, size=6.5, bold=False, cor=TEXTO_ESC)
 
-    # Ordenação — campo x:264–351, centro y=164
+    # Ordenação — x0=294.3 top=369.8 x1=360.6 bot=388.1
     escrever(c, fmt_data(d.get('data_ordenacao', '')),
-             x=272, y=161, size=6.5, bold=False, cor=CINZA_CLARO)
+             x=302, y=157, size=6.5, bold=False, cor=TEXTO_ESC)
 
     # ── VERSO ──────────────────────────────────────────────────────
 
-    # Nacionalidade — campo x:423–510, centro y=264
-    escrever(c, trunc(d.get('nacionalidade', 'Brasileira'), 13),
-             x=430, y=261, size=6.5, bold=False, cor=CINZA_CLARO)
+    # Nacionalidade — x0=405.7 top=272.2 x1=492.7 bot=290.5
+    escrever(c, trunc(d.get('nacionalidade', 'Brasileira'), 14),
+             x=413, y=255, size=6.5, bold=False, cor=TEXTO_ESC)
 
-    # Naturalidade — campo x:529–616, centro y=264
-    # fonte menor para caber cidades com nomes longos
+    # Naturalidade — x0=511.4 top=272.2 x1=598.4 bot=290.5
     escrever(c, trunc(d.get('naturalidade', ''), 18),
-             x=536, y=261, size=6, bold=False, cor=CINZA_CLARO)
+             x=519, y=255, size=6, bold=False, cor=TEXTO_ESC)
 
-    # Validade — campo x:423–510, centro y=227
+    # Validade — x0=405.7 top=309.0 x1=492.7 bot=327.3
     escrever(c, fmt_data(d.get('data_validade', '')),
-             x=430, y=224, size=6.5, bold=False, cor=CINZA_CLARO)
+             x=413, y=218, size=6.5, bold=False, cor=TEXTO_ESC)
 
-    # Estado Civil — campo x:529–616, centro y=228
+    # Estado Civil — x0=511.4 top=307.5 x1=598.4 bot=325.8
     escrever(c, trunc(d.get('estado_civil', ''), 13),
-             x=536, y=225, size=6.5, bold=False, cor=CINZA_CLARO)
+             x=519, y=219, size=6.5, bold=False, cor=TEXTO_ESC)
 
     # Presidente e cargo já estão fixos no modelo — não inserir
 
