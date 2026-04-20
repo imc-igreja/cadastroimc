@@ -2,38 +2,59 @@
 /**
  * excluir.php
  *
- * Remove um ministro do banco, apaga a foto do disco
- * e exclui o PDF gerado. Redireciona para a listagem.
+ * Remove um ou múltiplos ministros do banco, apaga as fotos do disco
+ * e exclui os PDFs gerados. Redireciona para a listagem.
  *
  * @package  CarteirinhaMinisterial
  */
 require_once 'config.php';
-
-$id = intval($_GET['id'] ?? 0);
-if (!$id) { header('Location: listar.php'); exit; }
+require_once 'storage.php';
 
 $pdo = conectar();
 
-// Busca foto para deletar o arquivo
-$stmt = $pdo->prepare("SELECT foto FROM ministros WHERE id = :id");
-$stmt->execute([':id' => $id]);
-$row = $stmt->fetch();
-
-if ($row && $row['foto']) {
-    $foto_path = UPLOAD_DIR . $row['foto'];
-    if (file_exists($foto_path)) {
-        unlink($foto_path);
-    }
+// Suporte a múltiplos IDs (?ids=1,2,3) ou único (?id=1)
+if (!empty($_GET['ids'])) {
+    $ids = array_filter(array_map('intval', explode(',', $_GET['ids'])));
+} elseif (!empty($_GET['id'])) {
+    $ids = [intval($_GET['id'])];
+} else {
+    header('Location: listar.php');
+    exit;
 }
 
-// Deleta PDF gerado se existir
-$pdf_path = __DIR__ . '/pdfs/carteirinha_' . $id . '.pdf';
-if (file_exists($pdf_path)) unlink($pdf_path);
+if (empty($ids)) { header('Location: listar.php'); exit; }
 
-// Remove do banco
-$stmt = $pdo->prepare("DELETE FROM ministros WHERE id = :id");
-$stmt->execute([':id' => $id]);
+foreach ($ids as $id) {
+    // Busca foto para deletar
+    $stmt = $pdo->prepare("SELECT foto FROM ministros WHERE id = :id");
+    $stmt->execute([':id' => $id]);
+    $row = $stmt->fetch();
 
-$_SESSION['msg'] = 'Ministro excluído com sucesso.';
+    if ($row && $row['foto']) {
+        // Remove do storage local
+        $foto_local = UPLOAD_DIR . $row['foto'];
+        if (file_exists($foto_local)) @unlink($foto_local);
+
+        // Remove do Supabase Storage
+        if (SUPABASE_SERVICE_KEY) {
+            $url = SUPABASE_URL . '/storage/v1/object/' . STORAGE_BUCKET . '/' . $row['foto'];
+            $ch = curl_init($url);
+            curl_setopt_array($ch, [CURLOPT_CUSTOMREQUEST => 'DELETE', CURLOPT_RETURNTRANSFER => true, CURLOPT_HTTPHEADER => ['Authorization: Bearer ' . SUPABASE_SERVICE_KEY]]);
+            curl_exec($ch);
+            curl_close($ch);
+        }
+    }
+
+    // Deleta PDF gerado se existir
+    $pdf_path = __DIR__ . '/pdfs/carteirinha_' . $id . '.pdf';
+    if (file_exists($pdf_path)) @unlink($pdf_path);
+
+    // Remove do banco
+    $stmt = $pdo->prepare("DELETE FROM ministros WHERE id = :id");
+    $stmt->execute([':id' => $id]);
+}
+
+$total = count($ids);
+$_SESSION['msg'] = $total === 1 ? 'Ministro excluído com sucesso.' : "$total ministros excluídos com sucesso.";
 header('Location: listar.php');
 exit;

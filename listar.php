@@ -277,6 +277,24 @@ session_write_close();
   .btn-cancel { background: #f0ede8; color: var(--text); }
   .btn-cancel:hover { background: #e5e1db; }
 
+  /* Checkbox */
+  .cb-select { width: 16px; height: 16px; cursor: pointer; accent-color: var(--danger); }
+
+  /* Barra de seleção */
+  .sel-bar {
+    display: none;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 18px;
+    background: #fdecea;
+    border-bottom: 1px solid #f5c6c6;
+    font-size: .85rem;
+    font-weight: 600;
+    color: var(--danger);
+  }
+  .sel-bar.show { display: flex; }
+  .sel-bar span { flex: 1; }
+
   @media(max-width:700px){
     table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
     .card { padding: 18px; }
@@ -335,10 +353,18 @@ session_write_close();
         <a href="index.php" class="btn btn-pdf">Cadastrar primeiro ministro</a>
       </div>
     <?php else: ?>
+
+    <!-- Barra de seleção múltipla -->
+    <div id="sel-bar" class="sel-bar">
+      <span id="sel-count">0 selecionado(s)</span>
+      <button class="btn btn-del" onclick="abrirModalMultiplo()">Excluir selecionados</button>
+      <button class="btn btn-cancel" onclick="limparSelecao()">Cancelar</button>
+    </div>
+
     <table id="tabela">
       <thead>
         <tr>
-          <th>#</th>
+          <th><input type="checkbox" class="cb-select" id="cb-todos" onclick="toggleTodos(this)" title="Selecionar todos"></th>
           <th>Foto</th>
           <th>Nome</th>
           <th>Cargo</th>
@@ -361,7 +387,7 @@ session_write_close();
           $val = $m['data_validade']  ? date('d/m/Y', strtotime($m['data_validade']))  : '—';
         ?>
         <tr class="linha">
-          <td><?= $m['id'] ?></td>
+          <td><input type="checkbox" class="cb-select cb-linha" value="<?= $m['id'] ?>" onclick="atualizarSelecao()"></td>
           <td>
             <?php if ($m['foto'] && file_exists(UPLOAD_DIR . $m['foto'])): ?>
               <img src="uploads/<?= htmlspecialchars($m['foto']) ?>" class="foto-thumb" alt="">
@@ -406,7 +432,63 @@ session_write_close();
   </div>
 </div>
 
+<!-- Modal de confirmação exclusão múltipla -->
+<div id="modal-multiplo" class="modal-overlay" onclick="fecharModalMultiplo(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h3>Confirmar exclusão</h3>
+    <p id="modal-multiplo-texto" style="font-size:.88rem;color:var(--text-muted);margin-bottom:20px;margin-top:4px">Tem certeza que deseja excluir os selecionados?</p>
+    <div class="modal-actions">
+      <button class="btn btn-cancel" onclick="fecharModalMultiplo()">Cancelar</button>
+      <button class="btn btn-del" onclick="confirmarExclusaoMultipla()">Excluir</button>
+    </div>
+  </div>
+</div>
+
 <script>
+// ── Seleção múltipla ──────────────────────────────────────────────
+function toggleTodos(cb) {
+  document.querySelectorAll('.cb-linha').forEach(c => {
+    if (c.closest('.linha').style.display !== 'none') c.checked = cb.checked;
+  });
+  atualizarSelecao();
+}
+
+function atualizarSelecao() {
+  var selecionados = document.querySelectorAll('.cb-linha:checked').length;
+  var bar = document.getElementById('sel-bar');
+  document.getElementById('sel-count').textContent = selecionados + ' selecionado(s)';
+  bar.classList.toggle('show', selecionados > 0);
+  // Atualiza checkbox "todos"
+  var total = document.querySelectorAll('.cb-linha:not([style*="display: none"])').length;
+  document.getElementById('cb-todos').indeterminate = selecionados > 0 && selecionados < total;
+  document.getElementById('cb-todos').checked = selecionados === total && total > 0;
+}
+
+function limparSelecao() {
+  document.querySelectorAll('.cb-linha').forEach(c => c.checked = false);
+  document.getElementById('cb-todos').checked = false;
+  document.getElementById('sel-bar').classList.remove('show');
+}
+
+function abrirModalMultiplo() {
+  var n = document.querySelectorAll('.cb-linha:checked').length;
+  document.getElementById('modal-multiplo-texto').textContent = 'Tem certeza que deseja excluir ' + n + ' ministro(s)?';
+  document.getElementById('modal-multiplo').classList.add('open');
+}
+
+function fecharModalMultiplo(event) {
+  if (!event || event.target.id === 'modal-multiplo') {
+    document.getElementById('modal-multiplo').classList.remove('open');
+  }
+}
+
+function confirmarExclusaoMultipla() {
+  var ids = Array.from(document.querySelectorAll('.cb-linha:checked')).map(c => c.value);
+  if (!ids.length) return;
+  window.location.href = 'excluir.php?ids=' + ids.join(',');
+}
+
+// ── Modal exclusão individual ─────────────────────────────────────
 let modalIdExcluir = null;
 
 function abrirModal(id, nome) {
