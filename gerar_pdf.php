@@ -9,6 +9,7 @@
  * @package  CarteirinhaMinisterial
  */
 require_once 'config.php';
+require_once 'storage.php';
 
 $id = intval($_GET['id'] ?? 0);
 if (!$id) { header('Location: listar.php'); exit; }
@@ -37,7 +38,7 @@ $dados = json_encode([
     'estado_civil'   => $ministro['estado_civil'],
     'data_ordenacao' => $ministro['data_ordenacao'],
     'data_validade'  => $ministro['data_validade'],
-    'foto'           => $ministro['foto'] ? __DIR__ . '/uploads/' . $ministro['foto'] : '',
+    'foto'           => $ministro['foto'] ? downloadFotoParaPython($ministro['foto']) : '',
     'saida'          => __DIR__ . '/pdfs/carteirinha_' . $ministro['id'] . '.pdf',
     'igreja_nome'    => IGREJA_NOME,
     'igreja_end'     => IGREJA_ENDERECO,

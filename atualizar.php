@@ -8,6 +8,7 @@
  * @package  CarteirinhaMinisterial
  */
 require_once 'config.php';
+require_once 'storage.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: listar.php');
@@ -55,17 +56,33 @@ if (!empty($_FILES['foto']['name'])) {
     }
 
     $filename = uniqid('min_') . '.' . $ext;
-    $destino  = UPLOAD_DIR . $filename;
 
-    if (!move_uploaded_file($_FILES['foto']['tmp_name'], $destino)) {
-        $_SESSION['erro'] = 'Erro ao salvar a foto.';
-        header("Location: editar.php?id=$id");
-        exit;
+    // Tenta salvar no Supabase Storage primeiro
+    $resultado = uploadFotoStorage($_FILES['foto']['tmp_name'], $filename);
+
+    if ($resultado === false) {
+        // Fallback: salva localmente
+        if (!is_dir(UPLOAD_DIR)) mkdir(UPLOAD_DIR, 0755, true);
+        $destino = UPLOAD_DIR . $filename;
+        if (!move_uploaded_file($_FILES['foto']['tmp_name'], $destino)) {
+            $_SESSION['erro'] = 'Erro ao salvar a foto.';
+            header("Location: editar.php?id=$id");
+            exit;
+        }
     }
 
-    // Remove foto antiga
-    if ($foto_path && file_exists(UPLOAD_DIR . $foto_path)) {
-        @unlink(UPLOAD_DIR . $foto_path);
+    // Remove foto antiga do storage
+    if ($foto_path) {
+        // tenta remover do storage (ignora erros)
+        if (SUPABASE_SERVICE_KEY) {
+            $url = SUPABASE_URL . '/storage/v1/object/' . STORAGE_BUCKET . '/' . $foto_path;
+            $ch = curl_init($url);
+            curl_setopt_array($ch, [CURLOPT_CUSTOMREQUEST => 'DELETE', CURLOPT_RETURNTRANSFER => true, CURLOPT_HTTPHEADER => ['Authorization: Bearer ' . SUPABASE_SERVICE_KEY]]);
+            curl_exec($ch); curl_close($ch);
+        }
+        // remove local se existir
+        $local = UPLOAD_DIR . $foto_path;
+        if (file_exists($local)) @unlink($local);
     }
 
     $foto_path = $filename;

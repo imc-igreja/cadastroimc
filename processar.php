@@ -9,6 +9,7 @@
  * @package  CarteirinhaMinisterial
  */
 require_once 'config.php';
+require_once 'storage.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: index.php');
@@ -42,18 +43,22 @@ if (!empty($_FILES['foto']['name'])) {
         exit;
     }
 
-    if (!is_dir(UPLOAD_DIR)) {
-        mkdir(UPLOAD_DIR, 0755, true);
+    $filename = uniqid('min_') . '.' . $ext;
+
+    // Tenta salvar no Supabase Storage primeiro
+    $resultado = uploadFotoStorage($_FILES['foto']['tmp_name'], $filename);
+
+    if ($resultado === false) {
+        // Fallback: salva localmente
+        if (!is_dir(UPLOAD_DIR)) mkdir(UPLOAD_DIR, 0755, true);
+        $destino = UPLOAD_DIR . $filename;
+        if (!move_uploaded_file($_FILES['foto']['tmp_name'], $destino)) {
+            $_SESSION['erro'] = 'Erro ao salvar a foto.';
+            header('Location: index.php');
+            exit;
+        }
     }
 
-    $filename   = uniqid('min_') . '.' . $ext;
-    $destino    = UPLOAD_DIR . $filename;
-
-    if (!move_uploaded_file($_FILES['foto']['tmp_name'], $destino)) {
-        $_SESSION['erro'] = 'Erro ao salvar a foto. Verifique permissões da pasta uploads/.';
-        header('Location: index.php');
-        exit;
-    }
     $foto_path = $filename;
 }
 
