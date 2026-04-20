@@ -81,16 +81,17 @@ function getUrlFoto(string $filename): string {
 function downloadFotoParaPython(string $filename): string {
     if (!$filename) return '';
 
-    // Se for arquivo local, retorna direto
+    // 1. Verifica se existe localmente primeiro
     $local = __DIR__ . '/uploads/' . $filename;
     if (file_exists($local)) return $local;
 
-    // Se tiver no Supabase Storage, faz download
-    if (SUPABASE_SERVICE_KEY && !str_starts_with($filename, 'http')) {
+    // 2. Se não existe localmente e tem service key, tenta baixar do Supabase Storage
+    if (SUPABASE_SERVICE_KEY) {
         $url = SUPABASE_URL . '/storage/v1/object/' . STORAGE_BUCKET . '/' . $filename;
         $ch = curl_init($url);
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT        => 10,
             CURLOPT_HTTPHEADER     => ['Authorization: Bearer ' . SUPABASE_SERVICE_KEY],
         ]);
         $content = curl_exec($ch);
@@ -98,7 +99,8 @@ function downloadFotoParaPython(string $filename): string {
         curl_close($ch);
 
         if ($http_code === 200 && $content) {
-            $tmp = tempnam(sys_get_temp_dir(), 'foto_') . '.' . pathinfo($filename, PATHINFO_EXTENSION);
+            $ext = pathinfo($filename, PATHINFO_EXTENSION);
+            $tmp = tempnam(sys_get_temp_dir(), 'foto_') . '.' . $ext;
             file_put_contents($tmp, $content);
             return $tmp;
         }

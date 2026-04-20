@@ -8,6 +8,7 @@
  *
  * @package  CarteirinhaMinisterial
  */
+ob_start(); // Captura qualquer output antes dos headers do PDF
 require_once 'config.php';
 require_once 'storage.php';
 
@@ -66,13 +67,14 @@ $saida_cmd = shell_exec("\"$python\" \"$script\" \"$tmp\" 2>&1");
 $pdf_path = __DIR__ . '/pdfs/carteirinha_' . $id . '.pdf';
 
 if (file_exists($pdf_path)) {
-    // Serve o PDF direto no browser
+    ob_end_clean(); // Limpa qualquer output anterior
     header('Content-Type: application/pdf');
     header('Content-Disposition: inline; filename="carteirinha_' . $id . '.pdf"');
     header('Content-Length: ' . filesize($pdf_path));
     readfile($pdf_path);
     exit;
 } else {
+    ob_end_clean();
     echo "<h2>Erro ao gerar PDF</h2><pre>$saida_cmd</pre>";
     echo '<a href="listar.php">← Voltar</a>';
 }
