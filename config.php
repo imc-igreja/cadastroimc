@@ -18,7 +18,7 @@ define('SUPABASE_HOST', getenv('SUPABASE_HOST') ?: ($is_prod ? 'aws-1-us-east-2.
 define('SUPABASE_PORT', getenv('SUPABASE_PORT') ?: ($is_prod ? '6543' : '5432'));
 define('SUPABASE_DB',   getenv('SUPABASE_DB')   ?: 'postgres');
 define('SUPABASE_USER', getenv('SUPABASE_USER') ?: 'postgres.mrzfopdvijuwixovfsql');
-define('SUPABASE_PASS', getenv('SUPABASE_PASS') ?: 'UHARfJQ290EukfEx');
+define('SUPABASE_PASS', getenv('SUPABASE_PASS') ?: 'tnlM3LLrY6q3Z0ET');
 
 define('UPLOAD_DIR', __DIR__ . '/uploads/');
 define('UPLOAD_URL', 'uploads/');
