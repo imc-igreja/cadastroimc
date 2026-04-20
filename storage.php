@@ -32,6 +32,7 @@ function uploadFotoStorage(string $tmp_path, string $filename): string|false {
         'jpg', 'jpeg' => 'image/jpeg',
         'png'         => 'image/png',
         'webp'        => 'image/webp',
+        'avif'        => 'image/avif',
         default       => 'application/octet-stream',
     };
 

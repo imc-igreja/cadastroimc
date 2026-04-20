@@ -38,7 +38,7 @@ $foto_path = $atual['foto'];
 // ── Upload de nova foto (opcional) ───────────────────────────────
 if (!empty($_FILES['foto']['name'])) {
     $ext   = strtolower(pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION));
-    $allow = ['jpg','jpeg','png','webp'];
+    $allow = ['jpg','jpeg','png','webp','avif'];
 
     if (!in_array($ext, $allow)) {
         $_SESSION['erro'] = 'Formato de imagem inválido. Use JPG ou PNG.';

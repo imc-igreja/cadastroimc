@@ -138,7 +138,7 @@ session_write_close();
               <img id="foto_preview" class="foto-preview" alt="Preview" style="display:none">
             <?php endif; ?>
           </div>
-          <input type="file" id="foto_input" name="foto" accept="image/*" onchange="previewFoto(this)">
+          <input type="file" id="foto_input" name="foto" accept="image/jpeg,image/png,image/webp,image/avif" onchange="previewFoto(this)">
         </div>
 
         <div class="section-title">Dados Pessoais</div>

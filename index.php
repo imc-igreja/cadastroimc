@@ -289,7 +289,7 @@ session_write_close();
             <small>JPG, PNG — max. 5MB</small>
             <img id="foto_preview" class="foto-preview" alt="Preview">
           </div>
-          <input type="file" id="foto_input" name="foto" accept="image/*" onchange="previewFoto(this)">
+          <input type="file" id="foto_input" name="foto" accept="image/jpeg,image/png,image/webp,image/avif" onchange="previewFoto(this)">
         </div>
 
         <div class="section-title">Dados Pessoais</div>
