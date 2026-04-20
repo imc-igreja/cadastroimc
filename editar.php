@@ -7,6 +7,7 @@
  * @package  CarteirinhaMinisterial
  */
 require_once 'config.php';
+require_once 'storage.php';
 
 $id = intval($_GET['id'] ?? 0);
 if (!$id) { header('Location: listar.php'); exit; }
@@ -132,8 +133,9 @@ session_write_close();
             </div>
             <p>Clique para trocar a foto</p>
             <small>JPG, PNG — max. 5MB — deixe em branco para manter a atual</small>
-            <?php if ($m['foto'] && file_exists(UPLOAD_DIR . $m['foto'])): ?>
-              <img id="foto_preview" class="foto-preview" src="uploads/<?= htmlspecialchars($m['foto']) ?>" alt="Foto atual">
+            <?php $foto_url = $m['foto'] ? getUrlFoto($m['foto']) : ''; ?>
+            <?php if ($foto_url): ?>
+              <img id="foto_preview" class="foto-preview" src="<?= htmlspecialchars($foto_url) ?>" alt="Foto atual">
             <?php else: ?>
               <img id="foto_preview" class="foto-preview" alt="Preview" style="display:none">
             <?php endif; ?>

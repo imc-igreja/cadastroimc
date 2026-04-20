@@ -8,6 +8,7 @@
  * @package  CarteirinhaMinisterial
  */
 require_once 'config.php';
+require_once 'storage.php';
 
 $pdo = conectar();
 $result = $pdo->query("SELECT * FROM ministros ORDER BY created_at DESC");
@@ -389,8 +390,11 @@ session_write_close();
         <tr class="linha">
           <td><input type="checkbox" class="cb-select cb-linha" value="<?= $m['id'] ?>" onclick="atualizarSelecao()"></td>
           <td>
-            <?php if ($m['foto'] && file_exists(UPLOAD_DIR . $m['foto'])): ?>
-              <img src="uploads/<?= htmlspecialchars($m['foto']) ?>" class="foto-thumb" alt="">
+            <?php
+              $foto_url = $m['foto'] ? getUrlFoto($m['foto']) : '';
+            ?>
+            <?php if ($foto_url): ?>
+              <img src="<?= htmlspecialchars($foto_url) ?>" class="foto-thumb" alt="">
             <?php else: ?>
               <div class="no-foto">
                 <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
