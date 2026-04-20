@@ -81,6 +81,26 @@ def escrever(c, texto, x, y, size=7, bold=False, cor=BRANCO, align='left'):
         c.drawString(x, y, texto)
     c.restoreState()
 
+def escrever_fit(c, texto, x, y, max_width, size=7, bold=False, cor=BRANCO, align='left', min_size=4.5):
+    """Escreve texto reduzindo a fonte até caber em max_width."""
+    c.saveState()
+    c.setFillColor(cor)
+    fonte = _fonte(bold)
+    s = size
+    while s >= min_size:
+        c.setFont(fonte, s)
+        w = c.stringWidth(texto, fonte, s)
+        if w <= max_width:
+            break
+        s -= 0.3
+    if align == 'center':
+        c.drawCentredString(x, y, texto)
+    elif align == 'right':
+        c.drawRightString(x, y, texto)
+    else:
+        c.drawString(x, y, texto)
+    c.restoreState()
+
 # ── Mapeamento de campos (coordenadas em pt, origem inferior-esq.) ─
 #
 # Convertido do pdfplumber (origem superior):  y_pdf = PH - y_plumber
@@ -206,47 +226,47 @@ def criar_camada(d):
         except Exception as e:
             print(f"Erro ao gerar QR code: {e}")
 
-    # Registro (campo amarelo) — x0=160.6 top=295.3 x1=215.6 bot=313.4
-    escrever(c, trunc(d.get('registro', ''), 8),
-             x=188, y=236, size=7, bold=True, cor=TEXTO_ESC, align='center')
+    # Registro (campo amarelo) — largura do campo: 215.6-160.6=55
+    escrever_fit(c, str(d.get('registro', '')),
+                 x=188, y=236, max_width=50, size=7, bold=True, cor=TEXTO_ESC, align='center')
 
-    # Nome — x0=220.4 top=304.8 x1=366.4 bot=323.1
-    escrever(c, trunc(d.get('nome', ''), 30),
-             x=228, y=226, size=7, bold=False, cor=TEXTO_ESC)
+    # Nome — largura do campo: 366.4-220.4=146
+    escrever_fit(c, str(d.get('nome', '')),
+                 x=228, y=226, max_width=134, size=7, bold=False, cor=TEXTO_ESC)
 
-    # Cargo — x0=219.4 top=335.5 x1=288.1 bot=353.8
-    escrever(c, trunc(d.get('cargo', ''), 13),
-             x=227, y=195, size=6.5, bold=False, cor=TEXTO_ESC)
+    # Cargo — largura do campo: 288.1-219.4=68.7
+    escrever_fit(c, str(d.get('cargo', '')),
+                 x=227, y=195, max_width=58, size=6.5, bold=False, cor=TEXTO_ESC)
 
-    # CPF — x0=294.3 top=335.5 x1=360.6 bot=353.8
-    escrever(c, trunc(d.get('cpf', ''), 14),
-             x=302, y=195, size=6.5, bold=False, cor=TEXTO_ESC)
+    # CPF — largura do campo: 360.6-294.3=66.3
+    escrever_fit(c, str(d.get('cpf', '')),
+                 x=302, y=195, max_width=56, size=6.5, bold=False, cor=TEXTO_ESC)
 
-    # RG — x0=219.9 top=369.8 x1=282.4 bot=388.1
-    escrever(c, trunc(d.get('rg', ''), 13),
-             x=227, y=161, size=6.5, bold=False, cor=TEXTO_ESC)
+    # RG — largura do campo: 282.4-219.9=62.5
+    escrever_fit(c, str(d.get('rg', '')),
+                 x=227, y=161, max_width=52, size=6.5, bold=False, cor=TEXTO_ESC)
 
-    # Ordenação — x0=294.3 top=369.8 x1=360.6 bot=388.1
-    escrever(c, fmt_data(d.get('data_ordenacao', '')),
-             x=302, y=161, size=6.5, bold=False, cor=TEXTO_ESC)
+    # Ordenação — largura do campo: 360.6-294.3=66.3
+    escrever_fit(c, fmt_data(d.get('data_ordenacao', '')),
+                 x=302, y=161, max_width=56, size=6.5, bold=False, cor=TEXTO_ESC)
 
     # ── VERSO ──────────────────────────────────────────────────────
 
-    # Nacionalidade — x0=405.7 top=272.2 x1=492.7 bot=290.5
-    escrever(c, trunc(d.get('nacionalidade', 'Brasileira'), 14),
-             x=413, y=259, size=6.5, bold=False, cor=TEXTO_ESC)
+    # Nacionalidade — largura do campo: 492.7-405.7=87
+    escrever_fit(c, str(d.get('nacionalidade', 'Brasileira')),
+                 x=413, y=259, max_width=77, size=6.5, bold=False, cor=TEXTO_ESC)
 
-    # Naturalidade — x0=511.4 top=272.2 x1=598.4 bot=290.5
-    escrever(c, trunc(d.get('naturalidade', ''), 18),
-             x=519, y=259, size=6, bold=False, cor=TEXTO_ESC)
+    # Naturalidade — largura do campo: 598.4-511.4=87
+    escrever_fit(c, str(d.get('naturalidade', '')),
+                 x=519, y=259, max_width=77, size=6.5, bold=False, cor=TEXTO_ESC)
 
-    # Validade — x0=405.7 top=309.0 x1=492.7 bot=327.3
-    escrever(c, fmt_data(d.get('data_validade', '')),
-             x=413, y=222, size=6.5, bold=False, cor=TEXTO_ESC)
+    # Validade — largura do campo: 492.7-405.7=87
+    escrever_fit(c, fmt_data(d.get('data_validade', '')),
+                 x=413, y=222, max_width=77, size=6.5, bold=False, cor=TEXTO_ESC)
 
-    # Estado Civil — x0=511.4 top=307.5 x1=598.4 bot=325.8
-    escrever(c, trunc(d.get('estado_civil', ''), 13),
-             x=519, y=223, size=6.5, bold=False, cor=TEXTO_ESC)
+    # Estado Civil — largura do campo: 598.4-511.4=87
+    escrever_fit(c, str(d.get('estado_civil', '')),
+                 x=519, y=223, max_width=77, size=6.5, bold=False, cor=TEXTO_ESC)
 
     # Presidente e cargo já estão fixos no modelo — não inserir
 
