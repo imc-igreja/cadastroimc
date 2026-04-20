@@ -118,42 +118,45 @@ def criar_camada(d):
             pil_img = Image.open(foto_path)
             img_width, img_height = pil_img.size
             
-            # Dimensões da área da foto na carteirinha (avatar azul)
-            # x0=160.6 top=317.5 x1=215.7 bot=370.3 → w=55, h=52.8
-            target_width = 46
-            target_height = 48
+            # Dimensões exatas do avatar azul no template
+            # x0=160.6 top=317.5 x1=215.7 bot=370.3 → w=55.1, h=52.8
+            target_width = 55
+            target_height = 53
             
             # Calcula o aspect ratio
             img_ratio = img_width / img_height
             target_ratio = target_width / target_height
             
-            # Ajusta dimensões mantendo proporção e preenchendo a área
+            # Ajusta dimensões mantendo proporção e preenchendo TODA a área (cover)
             if img_ratio > target_ratio:
-                # Imagem mais larga - ajusta pela altura
                 new_height = target_height
                 new_width = new_height * img_ratio
                 x_offset = (new_width - target_width) / 2
                 y_offset = 0
             else:
-                # Imagem mais alta - ajusta pela largura
                 new_width = target_width
                 new_height = new_width / img_ratio
                 x_offset = 0
                 y_offset = (new_height - target_height) / 2
             
-            # Posição da foto — avatar azul: x0=160.6 top=317.5 x1=215.7 bot=370.3
-            # y_pdf = 543 - 370.3 = 172.7
-            foto_x = 163
+            # Posição exata do avatar
+            foto_x = 161
             foto_y = 173
             
-            # Raio dos cantos arredondados
-            corner_radius = 5
+            # Raio dos cantos arredondados (igual ao template)
+            corner_radius = 8
 
-            # Desenha a imagem com crop centralizado e cantos arredondados
             img = ImageReader(foto_path)
             c.saveState()
 
-            # Clip usando roundRect (método correto do ReportLab)
+            # Fundo branco para cobrir o ícone de avatar do template
+            from reportlab.lib import colors as rl_colors
+            c.setFillColor(rl_colors.white)
+            p_bg = c.beginPath()
+            p_bg.roundRect(foto_x, foto_y, target_width, target_height, corner_radius)
+            c.drawPath(p_bg, fill=1, stroke=0)
+
+            # Clip e desenha a foto cobrindo toda a área
             p = c.beginPath()
             p.roundRect(foto_x, foto_y, target_width, target_height, corner_radius)
             c.clipPath(p, stroke=0, fill=1)
