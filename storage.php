@@ -10,7 +10,7 @@
 
 define('SUPABASE_URL',        getenv('SUPABASE_URL')        ?: 'https://mrzfopdvijuwixovfsql.supabase.co');
 define('SUPABASE_ANON_KEY',   getenv('SUPABASE_ANON_KEY')   ?: '');
-define('SUPABASE_SERVICE_KEY',getenv('SUPABASE_SERVICE_KEY')?: '');
+define('SUPABASE_SERVICE_KEY',getenv('SUPABASE_SERVICE_KEY')?: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1yemZvcGR2aWp1d2l4b3Zmc3FsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjUyMjM4NiwiZXhwIjoyMDkyMDk4Mzg2fQ.JWlO9XGcSbbMlS6GU5d87i6tPd5ji4E3qqqnCbLCz0M');
 define('STORAGE_BUCKET',      getenv('STORAGE_BUCKET')      ?: 'fotos');
 
 /**
